@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal de RRHH</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    :root{
+      --black:#000;
+      --yellow:#f2d436;
+      --bg:#f5f7fb;
+      --card:#fff;
+      --line:#e6e9ef;
+      --text:#111827;
+      --muted:#6b7280;
+      --soft:#f1f4f8;
+      --shadow:0 12px 28px rgba(15,23,42,.10);
+      --radius:14px;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Inter, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    header{
+      background:var(--black);
+      color:var(--yellow);
+      text-align:center;
+      padding:16px 20px 18px;
+      box-shadow:0 6px 20px rgba(0,0,0,.25);
+    }
+
+    header h1{
+      margin:0;
+      font-size:clamp(2.4rem,6vw,5rem);
+      font-weight:500;
+      letter-spacing:.03em;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:330px 1fr;
+      gap:24px;
+      max-width:1500px;
+      margin:0 auto;
+      padding:24px;
+    }
+
+    aside,
+    .search-card,
+    .photo-card,
+    .profile-card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+
+    aside{
+      height:calc(100vh - 155px);
+      min-height:560px;
+      padding:16px;
+      overflow:hidden;
+      position:sticky;
+      top:24px;
+    }
+
+    .sidebar-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding-bottom:12px;
+      margin-bottom:12px;
+      border-bottom:2px solid #bcd6f2;
+      color:#374151;
+      font-weight:800;
+      font-size:.88rem;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+    }
+
+    .tree{
+      height:calc(100% - 48px);
+      overflow:auto;
+      padding-right:6px;
+    }
+
+    .tree::-webkit-scrollbar{width:8px}
+    .tree::-webkit-scrollbar-thumb{background:#8b8f96;border-radius:999px}
+    .tree::-webkit-scrollbar-track{background:#edf0f4;border-radius:999px}
+
+    .dept{
+      margin-bottom:8px;
+      border-radius:9px;
+      overflow:hidden;
+    }
+
+    .dept-btn{
+      width:100%;
+      border:1px solid #d9dee7;
+      background:#f2f5f9;
+      padding:11px 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      cursor:pointer;
+      color:#222;
+      font-weight:800;
+      text-transform:uppercase;
+      text-align:left;
+      border-radius:8px;
+      transition:.18s ease;
+    }
+
+    .dept-btn:hover{background:#e9eef6}
+
+    .dept-left{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+
+    .mini{
+      width:18px;
+      height:18px;
+      border:1px solid #c8ced8;
+      border-radius:5px;
+      background:#fff;
+      display:grid;
+      place-items:center;
+      font-size:.68rem;
+      flex:0 0 auto;
+    }
+
+    .employees{
+      display:none;
+      padding:8px 0 4px;
+      background:#fff;
+    }
+
+    .dept.open .employees{display:block}
+
+    .employee{
+      width:100%;
+      border:0;
+      background:transparent;
+      text-align:left;
+      padding:9px 10px 9px 45px;
+      cursor:pointer;
+      font-size:.94rem;
+      color:#374151;
+      transition:.18s ease;
+      position:relative;
+      line-height:1.15;
+    }
+
+    .employee:hover{background:#f5f7fb}
+
+    .employee.active{
+      background:#eef2f7;
+      color:#000;
+      font-weight:800;
+    }
+
+    .employee.active::before{
+      content:"";
+      position:absolute;
+      left:0;
+      top:0;
+      bottom:0;
+      width:4px;
+      background:#050505;
+    }
+
+    main{
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+      min-width:0;
+    }
+
+    .search-card{
+      padding:20px;
+    }
+
+    label{
+      display:block;
+      font-weight:800;
+      text-transform:uppercase;
+      margin-bottom:10px;
+      font-size:.9rem;
+      letter-spacing:.04em;
+    }
+
+    .search-wrap{
+      position:relative;
+    }
+
+    .search-wrap input{
+      width:100%;
+      height:54px;
+      border:1px solid #9da5b1;
+      border-radius:4px;
+      background:#fff;
+      padding:0 50px 0 16px;
+      font-size:1rem;
+      outline:none;
+      transition:.2s ease;
+    }
+
+    .search-wrap input:focus{
+      border-color:#1f2937;
+      box-shadow:0 0 0 4px rgba(17,24,39,.09);
+    }
+
+    .search-wrap i{
+      position:absolute;
+      right:18px;
+      top:50%;
+      transform:translateY(-50%);
+      color:#6b7280;
+      font-size:1.25rem;
+    }
+
+    .profile-area{
+      display:grid;
+      grid-template-columns:360px 1fr;
+      gap:28px;
+      align-items:stretch;
+    }
+
+    .photo-card{
+      padding:16px;
+    }
+
+    .photo-box{
+      width:100%;
+      height:100%;
+      min-height:430px;
+      border-radius:8px;
+      background:#e5e7eb;
+      overflow:hidden;
+      display:grid;
+      place-items:center;
+    }
+
+    .photo-box img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .placeholder{
+      font-size:6rem;
+      color:#9ca3af;
+    }
+
+    .profile-card{
+      padding:44px 46px;
+      min-height:430px;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-start;
+      border-radius:2px;
+      border:1px solid #555;
+      box-shadow:8px 10px 20px rgba(0,0,0,.18);
+    }
+
+    .field{
+      display:grid;
+      grid-template-columns:150px 1fr;
+      align-items:center;
+      gap:12px;
+      margin-bottom:30px;
+    }
+
+    .field-label{
+      font-size:clamp(1.45rem,2.7vw,2.15rem);
+      font-weight:600;
+      color:#2d2d2d;
+    }
+
+    .field-value{
+      min-height:26px;
+      border-bottom:1px solid #9bb9d6;
+      padding-bottom:5px;
+      color:#111827;
+      font-size:1rem;
+      overflow-wrap:anywhere;
+    }
+
+    .field-value a{color:#155eef}
+
+    .single-badge{
+      width:max-content;
+      border:1px solid #d9dee7;
+      color:#4b5563;
+      border-radius:999px;
+      padding:9px 16px;
+      font-weight:500;
+      background:#fff;
+    }
+
+    .status{
+      padding:20px;
+      text-align:center;
+      color:#6b7280;
+    }
+
+    .error{
+      padding:16px;
+      background:#fff1f2;
+      border:1px solid #fecdd3;
+      color:#991b1b;
+      border-radius:10px;
+      font-weight:600;
+    }
+
+    @media(max-width:1020px){
+      .layout{grid-template-columns:1fr}
+      aside{
+        position:relative;
+        top:0;
+        height:360px;
+        min-height:360px;
+      }
+      .profile-area{grid-template-columns:1fr}
+      .photo-box{min-height:360px}
+    }
+
+    @media(max-width:640px){
+      .layout{padding:14px}
+      .profile-card{padding:26px 22px}
+      .field{grid-template-columns:1fr;gap:4px;margin-bottom:22px}
+      header h1{font-size:2.5rem}
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Portal de RRHH</h1>
+  </header>
+
+  <div class="layout">
+    <aside>
+      <div class="sidebar-title">
+        <span>Gerencia</span>
+        <i class="fa-solid fa-sitemap"></i>
+      </div>
+      <div id="tree" class="tree">
+        <div class="status">Cargando colaboradores...</div>
+      </div>
+    </aside>
+
+    <main>
+      <section class="search-card">
+        <label for="searchInput">Nombre</label>
+        <div class="search-wrap">
+          <input id="searchInput" type="search" placeholder="Buscar colaborador..." autocomplete="off">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+      </section>
+
+      <section class="profile-area">
+        <article class="photo-card">
+          <div id="photoBox" class="photo-box">
+            <i class="fa-solid fa-user placeholder"></i>
+          </div>
+        </article>
+
+        <article id="profileCard" class="profile-card">
+          <div class="status">Seleccione un colaborador.</div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    /*
+      CONEXIÓN CON GOOGLE SHEETS:
+      Esta URL debe permanecer publicada como CSV desde Google Sheets.
+      Cada recarga consulta nuevamente la fuente con cacheBust para evitar caché del navegador.
+    */
+    const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQCkw_G3Cv4cdxvoE5VSPcD5qrHoeL76yHZaGXQT10liss73w-TvtaXkT_w5TX_jeWvHdoLmlw5DnWE/pub?gid=1526421429&single=true&output=csv";
+
+    let employees = [];
+    let visibleEmployees = [];
+    let selectedName = "";
+
+    const tree = document.getElementById("tree");
+    const searchInput = document.getElementById("searchInput");
+    const photoBox = document.getElementById("photoBox");
+    const profileCard = document.getElementById("profileCard");
+
+    function parseCSV(text){
+      const rows = [];
+      let row = [];
+      let value = "";
+      let quoted = false;
+
+      for(let i = 0; i < text.length; i++){
+        const char = text[i];
+        const next = text[i + 1];
+
+        if(char === '"' && quoted && next === '"'){
+          value += '"';
+          i++;
+        }else if(char === '"'){
+          quoted = !quoted;
+        }else if(char === "," && !quoted){
+          row.push(value.trim());
+          value = "";
+        }else if((char === "\n" || char === "\r") && !quoted){
+          if(value || row.length){
+            row.push(value.trim());
+            rows.push(row);
+            row = [];
+            value = "";
+          }
+          if(char === "\r" && next === "\n") i++;
+        }else{
+          value += char;
+        }
+      }
+
+      if(value || row.length){
+        row.push(value.trim());
+        rows.push(row);
+      }
+
+      return rows.filter(r => r.some(c => c !== ""));
+    }
+
+    function normalizeText(value){
+      return String(value || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g,"")
+        .trim();
+    }
+
+    function normalizeKey(value){
+      return normalizeText(value).replace(/[^a-z0-9]/g,"");
+    }
+
+    function pick(row, names){
+      const index = {};
+      Object.keys(row).forEach(k => index[normalizeKey(k)] = row[k]);
+
+      for(const n of names){
+        const value = index[normalizeKey(n)];
+        if(value !== undefined && String(value).trim() !== "") return String(value).trim();
+      }
+      return "";
+    }
+
+    /*
+      PROCESAMIENTO DE DATOS:
+      Se aceptan variaciones de nombres de columnas:
+      NOMBRE, CORREO, GERENCIA, PUESTO y FOTO/IMAGEN/URL FOTO.
+    */
+    function mapRows(rows){
+      const headers = rows[0].map(h => h.trim());
+
+      return rows.slice(1).map(values => {
+        const raw = {};
+        headers.forEach((h, i) => raw[h] = values[i] || "");
+
+        return {
+          nombre: pick(raw, ["NOMBRE","Nombre","Colaborador","Empleado"]),
+          correo: pick(raw, ["CORREO","Correo","Email","E-mail","Mail"]),
+          gerencia: pick(raw, ["GERENCIA","Gerencia","Departamento","Area","Área"]),
+          puesto: pick(raw, ["PUESTO","Puesto","Cargo","Posicion","Posición"]),
+          foto: pick(raw, ["FOTO","Foto","IMAGEN","Imagen","URL FOTO","URL_FOTO","Fotografia","Fotografía","Link Foto","Foto URL"])
+        };
+      }).filter(e => e.nombre);
+    }
+
+    /*
+      CORRECCIÓN DE IMÁGENES:
+      Si la foto viene desde Google Drive, se convierte automáticamente
+      a formato thumbnail para que cargue correctamente en HTML.
+    */
+    function getImageURL(url){
+      if(!url) return "";
+
+      let clean = String(url).trim();
+
+      const drivePatterns = [
+        /drive\.google\.com\/file\/d\/([^/]+)/,
+        /drive\.google\.com\/open\?id=([^&]+)/,
+        /drive\.google\.com\/uc\?id=([^&]+)/,
+        /id=([^&]+)/
+      ];
+
+      for(const pattern of drivePatterns){
+        const match = clean.match(pattern);
+        if(match && match[1]){
+          return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w900`;
+        }
+      }
+
+      return clean;
+    }
+
+    async function loadData(){
+      try{
+        const response = await fetch(`${SHEET_URL}&cacheBust=${Date.now()}`, { cache: "no-store" });
+        if(!response.ok) throw new Error("No se pudo conectar con Google Sheets.");
+
+        const csv = await response.text();
+        const rows = parseCSV(csv);
+
+        employees = mapRows(rows);
+        visibleEmployees = [...employees];
+
+        if(!employees.length){
+          tree.innerHTML = `<div class="status">No se encontraron registros en la hoja.</div>`;
+          return;
+        }
+
+        renderTree();
+        selectEmployee(employees[0]);
+      }catch(error){
+        tree.innerHTML = `<div class="error">${error.message}</div>`;
+        profileCard.innerHTML = `<div class="error">Revise que la hoja esté publicada en formato CSV y que el gid sea correcto.</div>`;
+      }
+    }
+
+    /*
+      CONSTRUCCIÓN DINÁMICA DEL ÁRBOL DE GERENCIAS.
+    */
+    function renderTree(){
+      const grouped = visibleEmployees.reduce((acc, emp) => {
+        const key = emp.gerencia || "Sin gerencia";
+        if(!acc[key]) acc[key] = [];
+        acc[key].push(emp);
+        return acc;
+      }, {});
+
+      const content = Object.entries(grouped).map(([gerencia, list], index) => {
+        const shouldOpen = index === 0 || list.some(e => e.nombre === selectedName);
+
+        return `
+          <div class="dept ${shouldOpen ? "open" : ""}">
+            <button class="dept-btn" onclick="toggleDept(this)">
+              <span class="dept-left">
+                <span class="mini"><i class="fa-solid ${shouldOpen ? "fa-minus" : "fa-plus"}"></i></span>
+                <span>${escapeHTML(gerencia)}</span>
+              </span>
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
+
+            <div class="employees">
+              ${list.map(emp => `
+                <button class="employee ${emp.nombre === selectedName ? "active" : ""}"
+                        onclick="selectEmployeeByName('${encodeURIComponent(emp.nombre)}')">
+                  ${escapeHTML(emp.nombre)}
+                </button>
+              `).join("")}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      tree.innerHTML = content || `<div class="status">No hay resultados.</div>`;
+    }
+
+    function toggleDept(button){
+      const dept = button.closest(".dept");
+      dept.classList.toggle("open");
+
+      const miniIcon = button.querySelector(".mini i");
+      miniIcon.className = "fa-solid " + (dept.classList.contains("open") ? "fa-minus" : "fa-plus");
+    }
+
+    function selectEmployeeByName(encodedName){
+      const name = decodeURIComponent(encodedName);
+      const emp = employees.find(e => e.nombre === name);
+      if(emp) selectEmployee(emp);
+    }
+
+    /*
+      CONSTRUCCIÓN DINÁMICA DEL PERFIL.
+    */
+    function selectEmployee(emp){
+      selectedName = emp.nombre;
+
+      document.querySelectorAll(".employee").forEach(btn => {
+        btn.classList.toggle("active", btn.textContent.trim() === emp.nombre);
+      });
+
+      const image = getImageURL(emp.foto);
+
+      photoBox.innerHTML = image
+        ? `<img src="${escapeHTML(image)}"
+                alt="Foto de ${escapeHTML(emp.nombre)}"
+                referrerpolicy="no-referrer"
+                onerror="this.parentElement.innerHTML='<i class=&quot;fa-solid fa-user placeholder&quot;></i>'">`
+        : `<i class="fa-solid fa-user placeholder"></i>`;
+
+      profileCard.innerHTML = `
+        <div class="field">
+          <div class="field-label">Nombre:</div>
+          <div class="field-value">${escapeHTML(emp.nombre)}</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Gerencia:</div>
+          <div class="field-value">${escapeHTML(emp.gerencia || "No indicado")}</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Puesto:</div>
+          <div class="field-value">${escapeHTML(emp.puesto || "No indicado")}</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Correo:</div>
+          <div class="field-value">
+            ${emp.correo ? `<a href="mailto:${escapeHTML(emp.correo)}">${escapeHTML(emp.correo)}</a>` : "No indicado"}
+          </div>
+        </div>
+
+        <div class="single-badge">
+          <i class="fa-solid fa-user"></i> Perfil
+        </div>
+      `;
+    }
+
+    /*
+      BÚSQUEDA EN TIEMPO REAL.
+    */
+    function applySearch(){
+      const q = normalizeText(searchInput.value);
+
+      visibleEmployees = employees.filter(emp => {
+        return [emp.nombre, emp.gerencia, emp.puesto, emp.correo]
+          .some(v => normalizeText(v).includes(q));
+      });
+
+      renderTree();
+
+      if(visibleEmployees.length){
+        selectEmployee(visibleEmployees[0]);
+      }else{
+        photoBox.innerHTML = `<i class="fa-solid fa-user placeholder"></i>`;
+        profileCard.innerHTML = `<div class="status">No se encontraron colaboradores.</div>`;
+      }
+    }
+
+    function escapeHTML(value){
+      return String(value || "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    searchInput.addEventListener("input", applySearch);
+    loadData();
+  </script>
+</body>
+</html>
