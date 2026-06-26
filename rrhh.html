@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal de RRHH</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    :root{
+      --bg:#f4f6f9;
+      --panel:#ffffff;
+      --dark:#050505;
+      --gold:#f0cf36;
+      --text:#232323;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --accent:#1f6feb;
+      --shadow:0 16px 35px rgba(15,23,42,.14);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Inter, Arial, sans-serif;
+      color:var(--text);
+      background:linear-gradient(135deg,#eef2f7 0%,#fff 45%,#f5f6fa 100%);
+      min-height:100vh;
+    }
+
+    header{
+      background:var(--dark);
+      color:var(--gold);
+      text-align:center;
+      padding:18px 20px 20px;
+      box-shadow:0 8px 24px rgba(0,0,0,.25);
+      position:sticky;
+      top:0;
+      z-index:50;
+    }
+
+    header h1{
+      margin:0;
+      font-size:clamp(2.2rem,6vw,4.7rem);
+      font-weight:500;
+      letter-spacing:.04em;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:330px 1fr;
+      gap:24px;
+      padding:22px;
+      max-width:1500px;
+      margin:auto;
+    }
+
+    aside,.main-card,.profile-card,.photo-card,.stats-card{
+      background:rgba(255,255,255,.88);
+      border:1px solid rgba(229,231,235,.9);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(12px);
+    }
+
+    aside{
+      padding:16px;
+      height:calc(100vh - 145px);
+      position:sticky;
+      top:116px;
+      overflow:hidden;
+    }
+
+    .side-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:12px;
+      padding-bottom:10px;
+      border-bottom:2px solid #b7d7f3;
+      font-size:.85rem;
+      color:#374151;
+      font-weight:800;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+    }
+
+    .tree{
+      overflow:auto;
+      height:calc(100% - 45px);
+      padding-right:4px;
+    }
+
+    .dept{
+      margin-bottom:8px;
+      border-radius:12px;
+      overflow:hidden;
+    }
+
+    .dept-btn{
+      width:100%;
+      border:0;
+      background:#f3f4f6;
+      color:#343a40;
+      padding:11px 12px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      cursor:pointer;
+      text-align:left;
+      font-weight:800;
+      text-transform:uppercase;
+      transition:.25s ease;
+    }
+
+    .dept-btn:hover,.dept.open .dept-btn{background:#e7edf5}
+
+    .toggle{
+      width:20px;
+      height:20px;
+      border:1px solid #c8ccd2;
+      display:grid;
+      place-items:center;
+      border-radius:5px;
+      background:white;
+      flex:0 0 auto;
+      font-size:.75rem;
+    }
+
+    .employees{
+      display:none;
+      background:white;
+    }
+
+    .dept.open .employees{display:block}
+
+    .employee-item{
+      border:0;
+      width:100%;
+      background:white;
+      text-align:left;
+      padding:9px 12px 9px 45px;
+      cursor:pointer;
+      font-size:.92rem;
+      color:#4b5563;
+      transition:.2s ease;
+      position:relative;
+    }
+
+    .employee-item:hover{background:#f5f8ff;color:#111827}
+    .employee-item.active{
+      background:#eef2f7;
+      color:#111827;
+      font-weight:700;
+    }
+    .employee-item.active:before{
+      content:"";
+      position:absolute;
+      left:0;
+      top:0;
+      bottom:0;
+      width:4px;
+      background:#111827;
+    }
+
+    main{
+      display:flex;
+      flex-direction:column;
+      gap:20px;
+      min-width:0;
+    }
+
+    .main-card{
+      padding:18px;
+    }
+
+    .top-row{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:14px;
+      margin-bottom:18px;
+    }
+
+    .kpi{
+      background:linear-gradient(180deg,#fff,#f7f8fb);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:16px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-height:88px;
+      box-shadow:0 10px 22px rgba(15,23,42,.07);
+    }
+
+    .kpi i{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      background:#111827;
+      color:var(--gold);
+      font-size:1.15rem;
+    }
+
+    .kpi span{
+      display:block;
+      color:var(--muted);
+      font-size:.78rem;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+    }
+
+    .kpi strong{
+      font-size:1.7rem;
+      line-height:1.1;
+    }
+
+    .search-box label{
+      display:block;
+      font-weight:800;
+      font-size:.86rem;
+      letter-spacing:.05em;
+      margin-bottom:8px;
+      text-transform:uppercase;
+    }
+
+    .search-wrap{
+      position:relative;
+    }
+
+    .search-wrap input{
+      width:100%;
+      border:1px solid #a8adb5;
+      border-radius:2px;
+      padding:15px 46px 15px 16px;
+      font-size:1rem;
+      outline:none;
+      transition:.25s ease;
+      background:#fff;
+    }
+
+    .search-wrap input:focus{
+      border-color:var(--accent);
+      box-shadow:0 0 0 4px rgba(31,111,235,.12);
+    }
+
+    .search-wrap i{
+      position:absolute;
+      right:15px;
+      top:50%;
+      transform:translateY(-50%);
+      color:#69707a;
+    }
+
+    .content-grid{
+      display:grid;
+      grid-template-columns:330px minmax(360px,1fr);
+      gap:28px;
+      align-items:start;
+    }
+
+    .photo-card{
+      padding:16px;
+    }
+
+    .photo{
+      width:100%;
+      aspect-ratio:1/1.05;
+      border-radius:12px;
+      overflow:hidden;
+      background:#e5e7eb;
+      display:grid;
+      place-items:center;
+      position:relative;
+    }
+
+    .photo img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .placeholder{
+      font-size:6rem;
+      color:#9ca3af;
+    }
+
+    .profile-card{
+      padding:28px;
+      min-height:360px;
+      border-radius:3px;
+      border:1px solid #555;
+      box-shadow:10px 12px 22px rgba(0,0,0,.22);
+      animation:fadeUp .45s ease both;
+    }
+
+    .field{
+      display:grid;
+      grid-template-columns:150px 1fr;
+      gap:10px;
+      align-items:baseline;
+      margin-bottom:24px;
+    }
+
+    .field .label{
+      font-size:clamp(1.5rem,3vw,2.1rem);
+      font-weight:500;
+      color:#2b2b2b;
+    }
+
+    .field .value{
+      color:#111827;
+      font-size:1rem;
+      border-bottom:1px solid #84a8c8;
+      width:max-content;
+      max-width:100%;
+      overflow-wrap:anywhere;
+      padding-bottom:2px;
+    }
+
+    .badges{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:20px;
+    }
+
+    .badge{
+      background:#f3f4f6;
+      border:1px solid #e5e7eb;
+      color:#374151;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:.85rem;
+      font-weight:700;
+    }
+
+    .table-card{
+      margin-top:20px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      overflow:hidden;
+      background:white;
+    }
+
+    .table-head{
+      padding:14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background:#f9fafb;
+      border-bottom:1px solid var(--line);
+      font-weight:800;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:.92rem;
+    }
+
+    th,td{
+      padding:12px 14px;
+      border-bottom:1px solid #edf0f4;
+      text-align:left;
+    }
+
+    th{
+      color:#4b5563;
+      background:#fbfbfc;
+      font-size:.78rem;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+    }
+
+    tr:hover td{background:#f8fbff}
+
+    .loader,.error,.empty{
+      padding:22px;
+      text-align:center;
+      color:#6b7280;
+    }
+
+    .error{
+      color:#b91c1c;
+      background:#fff1f2;
+      border:1px solid #fecdd3;
+      border-radius:14px;
+    }
+
+    @keyframes fadeUp{
+      from{opacity:0;transform:translateY(14px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+
+    @media(max-width:1050px){
+      .layout{grid-template-columns:1fr}
+      aside{
+        position:relative;
+        top:auto;
+        height:360px;
+      }
+      .top-row{grid-template-columns:repeat(2,1fr)}
+    }
+
+    @media(max-width:760px){
+      .layout{padding:14px}
+      .content-grid{grid-template-columns:1fr}
+      .top-row{grid-template-columns:1fr}
+      .field{grid-template-columns:1fr;gap:4px}
+      .profile-card{padding:20px}
+      header h1{font-size:2.4rem}
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Portal de RRHH</h1>
+  </header>
+
+  <div class="layout">
+    <aside>
+      <div class="side-title">
+        <span>Gerencia</span>
+        <i class="fa-solid fa-sitemap"></i>
+      </div>
+      <div id="tree" class="tree">
+        <div class="loader">Cargando colaboradores...</div>
+      </div>
+    </aside>
+
+    <main>
+      <section class="main-card">
+        <div class="top-row">
+          <div class="kpi"><i class="fa-solid fa-users"></i><div><span>Colaboradores</span><strong id="kpiTotal">0</strong></div></div>
+          <div class="kpi"><i class="fa-solid fa-building"></i><div><span>Gerencias</span><strong id="kpiGerencias">0</strong></div></div>
+          <div class="kpi"><i class="fa-solid fa-briefcase"></i><div><span>Puestos</span><strong id="kpiPuestos">0</strong></div></div>
+          <div class="kpi"><i class="fa-solid fa-envelope"></i><div><span>Correos</span><strong id="kpiCorreos">0</strong></div></div>
+        </div>
+
+        <div class="search-box">
+          <label for="searchInput">Nombre</label>
+          <div class="search-wrap">
+            <input id="searchInput" type="search" placeholder="Search" autocomplete="off">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-grid">
+        <div class="photo-card">
+          <div class="photo" id="photoBox">
+            <i class="fa-solid fa-user placeholder"></i>
+          </div>
+        </div>
+
+        <article class="profile-card" id="profileCard">
+          <div class="empty">Seleccione un colaborador para ver su información.</div>
+        </article>
+      </section>
+
+      <section class="table-card">
+        <div class="table-head">
+          <span><i class="fa-solid fa-list"></i> Directorio filtrado</span>
+          <span id="resultCount">0 registros</span>
+        </div>
+        <div style="overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Gerencia</th>
+                <th>Puesto</th>
+                <th>Correo</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <tr><td colspan="4" class="loader">Cargando datos...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    /* ============================================================
+       CONFIGURACIÓN
+       Aquí se define la URL pública CSV de Google Sheets.
+       Al actualizar la hoja y recargar la web, los datos se refrescan.
+    ============================================================ */
+    const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQCkw_G3Cv4cdxvoE5VSPcD5qrHoeL76yHZaGXQT10liss73w-TvtaXkT_w5TX_jeWvHdoLmlw5DnWE/pub?gid=1526421429&single=true&output=csv";
+
+    let employees = [];
+    let filteredEmployees = [];
+    let selectedEmployee = null;
+
+    const tree = document.getElementById("tree");
+    const tableBody = document.getElementById("tableBody");
+    const searchInput = document.getElementById("searchInput");
+    const profileCard = document.getElementById("profileCard");
+    const photoBox = document.getElementById("photoBox");
+    const resultCount = document.getElementById("resultCount");
+
+    /* ============================================================
+       LECTOR CSV
+       Convierte el CSV recibido desde Google Sheets en objetos JS.
+       Soporta comas, saltos de línea y comillas dentro de campos.
+    ============================================================ */
+    function parseCSV(text){
+      const rows = [];
+      let row = [], current = "", insideQuotes = false;
+
+      for(let i = 0; i < text.length; i++){
+        const char = text[i];
+        const next = text[i + 1];
+
+        if(char === '"' && insideQuotes && next === '"'){
+          current += '"';
+          i++;
+        }else if(char === '"'){
+          insideQuotes = !insideQuotes;
+        }else if(char === "," && !insideQuotes){
+          row.push(current.trim());
+          current = "";
+        }else if((char === "\n" || char === "\r") && !insideQuotes){
+          if(current || row.length){
+            row.push(current.trim());
+            rows.push(row);
+            row = [];
+            current = "";
+          }
+          if(char === "\r" && next === "\n") i++;
+        }else{
+          current += char;
+        }
+      }
+
+      if(current || row.length){
+        row.push(current.trim());
+        rows.push(row);
+      }
+
+      return rows.filter(r => r.some(c => c !== ""));
+    }
+
+    function normalizeKey(key){
+      return key
+        .toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+        .replace(/[^a-z0-9]/g,"");
+    }
+
+    function pick(row, candidates){
+      const normalized = {};
+      Object.keys(row).forEach(k => normalized[normalizeKey(k)] = row[k]);
+      for(const c of candidates){
+        const value = normalized[normalizeKey(c)];
+        if(value !== undefined && value !== null && String(value).trim() !== "") return value.trim();
+      }
+      return "";
+    }
+
+    /* ============================================================
+       PROCESAMIENTO DE DATOS
+       Mapea columnas aunque tengan variaciones de nombre.
+       Columnas esperadas: NOMBRE, CORREO, GERENCIA, PUESTO, FOTO/IMAGEN.
+    ============================================================ */
+    function mapRows(rows){
+      const headers = rows[0].map(h => h.trim());
+      return rows.slice(1).map(values => {
+        const raw = {};
+        headers.forEach((h, i) => raw[h] = values[i] || "");
+
+        return {
+          nombre: pick(raw, ["NOMBRE","Nombre","Empleado","Colaborador"]),
+          correo: pick(raw, ["CORREO","Correo","Email","E-mail","Mail"]),
+          gerencia: pick(raw, ["GERENCIA","Gerencia","Departamento","Area","Área"]),
+          puesto: pick(raw, ["PUESTO","Puesto","Cargo","Posicion","Posición"]),
+          foto: pick(raw, ["FOTO","Foto","IMAGEN","Imagen","URL FOTO","URL_FOTO","Fotografia","Fotografía"])
+        };
+      }).filter(e => e.nombre);
+    }
+
+    async function loadData(){
+      try{
+        const response = await fetch(SHEET_URL + "&cacheBust=" + Date.now());
+        if(!response.ok) throw new Error("No se pudo conectar con Google Sheets.");
+
+        const csvText = await response.text();
+        const rows = parseCSV(csvText);
+        employees = mapRows(rows);
+        filteredEmployees = [...employees];
+
+        updateKPIs();
+        renderTree();
+        renderTable();
+
+        if(employees.length) selectEmployee(employees[0]);
+        else showEmpty();
+
+      }catch(error){
+        tree.innerHTML = `<div class="error">Error al cargar datos. Verifique que Google Sheet esté publicado como CSV.</div>`;
+        tableBody.innerHTML = `<tr><td colspan="4" class="error">${error.message}</td></tr>`;
+      }
+    }
+
+    function updateKPIs(){
+      document.getElementById("kpiTotal").textContent = employees.length;
+      document.getElementById("kpiGerencias").textContent = new Set(employees.map(e => e.gerencia).filter(Boolean)).size;
+      document.getElementById("kpiPuestos").textContent = new Set(employees.map(e => e.puesto).filter(Boolean)).size;
+      document.getElementById("kpiCorreos").textContent = employees.filter(e => e.correo).length;
+    }
+
+    /* ============================================================
+       COMPONENTE DINÁMICO: ÁRBOL POR GERENCIA
+    ============================================================ */
+    function renderTree(){
+      const grouped = employees.reduce((acc, emp) => {
+        const key = emp.gerencia || "Sin gerencia";
+        if(!acc[key]) acc[key] = [];
+        acc[key].push(emp);
+        return acc;
+      }, {});
+
+      tree.innerHTML = Object.entries(grouped).map(([gerencia, list], index) => `
+        <div class="dept ${index === 0 ? "open" : ""}">
+          <button class="dept-btn" onclick="toggleDept(this)">
+            <span class="toggle"><i class="fa-solid ${index === 0 ? "fa-minus" : "fa-plus"}"></i></span>
+            <span>${gerencia}</span>
+          </button>
+          <div class="employees">
+            ${list.map(emp => `
+              <button class="employee-item" data-name="${escapeHTML(emp.nombre)}" onclick="selectEmployeeByName('${encodeURIComponent(emp.nombre)}')">
+                ${emp.nombre}
+              </button>
+            `).join("")}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function toggleDept(button){
+      const dept = button.closest(".dept");
+      dept.classList.toggle("open");
+      const icon = button.querySelector("i");
+      icon.className = "fa-solid " + (dept.classList.contains("open") ? "fa-minus" : "fa-plus");
+    }
+
+    function selectEmployeeByName(encodedName){
+      const name = decodeURIComponent(encodedName);
+      const emp = employees.find(e => e.nombre === name);
+      if(emp) selectEmployee(emp);
+    }
+
+    /* ============================================================
+       COMPONENTE DINÁMICO: TARJETA DE PERFIL
+    ============================================================ */
+    function selectEmployee(emp){
+      selectedEmployee = emp;
+
+      document.querySelectorAll(".employee-item").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.name === emp.nombre);
+      });
+
+      photoBox.innerHTML = emp.foto
+        ? `<img src="${emp.foto}" alt="Fotografía de ${escapeHTML(emp.nombre)}" onerror="this.parentElement.innerHTML='<i class=&quot;fa-solid fa-user placeholder&quot;></i>'">`
+        : `<i class="fa-solid fa-user placeholder"></i>`;
+
+      profileCard.innerHTML = `
+        <div class="field"><div class="label">Nombre:</div><div class="value">${escapeHTML(emp.nombre)}</div></div>
+        <div class="field"><div class="label">Gerencia:</div><div class="value">${escapeHTML(emp.gerencia || "No indicado")}</div></div>
+        <div class="field"><div class="label">puesto:</div><div class="value">${escapeHTML(emp.puesto || "No indicado")}</div></div>
+        <div class="field"><div class="label">correo:</div><div class="value">${emp.correo ? `<a href="mailto:${escapeHTML(emp.correo)}">${escapeHTML(emp.correo)}</a>` : "No indicado"}</div></div>
+        <div class="badges">
+          <span class="badge"><i class="fa-solid fa-id-card"></i> Perfil RH</span>
+          <span class="badge"><i class="fa-solid fa-building-user"></i> ${escapeHTML(emp.gerencia || "Sin gerencia")}</span>
+        </div>
+      `;
+    }
+
+    function showEmpty(){
+      profileCard.innerHTML = `<div class="empty">No hay colaboradores disponibles.</div>`;
+      photoBox.innerHTML = `<i class="fa-solid fa-user placeholder"></i>`;
+    }
+
+    /* ============================================================
+       COMPONENTE DINÁMICO: TABLA Y BÚSQUEDA
+    ============================================================ */
+    function applySearch(){
+      const q = searchInput.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+      filteredEmployees = employees.filter(e =>
+        [e.nombre, e.gerencia, e.puesto, e.correo].some(v =>
+          String(v || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").includes(q)
+        )
+      );
+
+      renderTable();
+
+      if(filteredEmployees.length) selectEmployee(filteredEmployees[0]);
+    }
+
+    function renderTable(){
+      resultCount.textContent = `${filteredEmployees.length} registros`;
+
+      if(!filteredEmployees.length){
+        tableBody.innerHTML = `<tr><td colspan="4" class="empty">No se encontraron resultados.</td></tr>`;
+        return;
+      }
+
+      tableBody.innerHTML = filteredEmployees.map(emp => `
+        <tr onclick="selectEmployeeByName('${encodeURIComponent(emp.nombre)}')" style="cursor:pointer">
+          <td><strong>${escapeHTML(emp.nombre)}</strong></td>
+          <td>${escapeHTML(emp.gerencia || "")}</td>
+          <td>${escapeHTML(emp.puesto || "")}</td>
+          <td>${emp.correo ? `<a href="mailto:${escapeHTML(emp.correo)}">${escapeHTML(emp.correo)}</a>` : ""}</td>
+        </tr>
+      `).join("");
+    }
+
+    function escapeHTML(value){
+      return String(value || "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    searchInput.addEventListener("input", applySearch);
+    loadData();
+  </script>
+</body>
+</html>
